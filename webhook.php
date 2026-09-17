@@ -320,10 +320,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_webhook'])) {
                 </div>
                 <div class="mt-3">
                     <button class="btn btn-success btn-sm">Save Changes</button>
-                    <a href="webhook.php?type=<?= urlencode($type) ?>&edit_creds=1&webhookUrl=<?= urlencode($webhook['webhookUrl']) ?>&notificationEmailAddress=<?= urlencode($webhook['notificationEmailAddress']) ?>&webhook_name=<?= urlencode($webhook['name']) ?>&webhook_id=<?= urlencode($webhook['id']) ?>"
+                    <a href="webhook.php?type=<?= urlencode($type) ?>&edit_creds=1&webhookUrl=<?= urlencode($webhook['webhookUrl']) ?>&notificationEmailAddress=<?= urlencode($webhook['notificationEmailAddress']) ?>&webhook_name=<?= urlencode($webhook['name']) ?>&webhook_id=<?= urlencode($webhook['id']) ?>" <?php // nosemgrep: php.lang.security.taint-unsafe-echo-tag.taint-unsafe-echo-tag -- every value in this link is urlencoded ?>
                         class="btn btn-info btn-sm">Edit Fields</a>
 
-                    <a href="?type=<?= urlencode($type) ?>&delete_id=<?= urlencode($webhook['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this webhook?')">Delete</a>
+                    <a href="?type=<?= urlencode($type) ?>&delete_id=<?= urlencode($webhook['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this webhook?')">Delete</a> <?php // nosemgrep: php.lang.security.taint-unsafe-echo-tag.taint-unsafe-echo-tag -- every value in this link is urlencoded ?>
                 </div>
             </form>
         <?php endforeach; ?>

@@ -30,7 +30,7 @@ if (isset($_GET['delete'])) {
     if ($deleteCode == 200 || $deleteCode == 204) {
         echo "<p style='color:green;'>? Webhook ID " . htmlspecialchars($id) . " deleted successfully.</p>";
     } else {
-        echo "<p style='color:red;'>? Failed to delete webhook ID " . htmlspecialchars($id) . " (HTTP " . htmlspecialchars($deleteCode) . "): " . htmlspecialchars($deleteResponse) . "</p>";
+        echo "<p style='color:red;'>? Failed to delete webhook ID " . htmlspecialchars($id) . " (HTTP " . htmlspecialchars($deleteCode) . "): " . htmlspecialchars($deleteResponse) . "</p>"; // nosemgrep: php.lang.security.injection.tainted-sql-string.tainted-sql-string -- this is an echo, not SQL; each value is escaped
     }
 }
 

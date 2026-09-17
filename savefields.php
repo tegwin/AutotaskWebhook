@@ -78,7 +78,7 @@ $headers = [
 
 
 if (!$integrationCode || !$apiUser || !$apiSecret) {
-    echo renderCredentialForm($integrationCode, $apiUser, $apiSecret, $webhookUrl, $baseUrl, $notificationemailaddress, $webhook_name);
+    echo renderCredentialForm($integrationCode, $apiUser, $apiSecret, $webhookUrl, $baseUrl, $notificationemailaddress, $webhook_name); // nosemgrep: php.lang.security.taint-unsafe-echo-tag.taint-unsafe-echo-tag -- renderCredentialForm escapes every value it interpolates
     exit;
 }
 

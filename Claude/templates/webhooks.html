@@ -16,7 +16,7 @@
 {% else %}
     {% for webhook in webhooks %}
         <div class="border rounded p-3 mb-4">
-            <form method="post" action="{{ url_for('update_webhook', type=wtype) }}" class="mb-2">
+            <form method="post" action="{{ url_for('update_webhook', type=wtype) }}" class="mb-2"> {# nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -- Flask app; the token is the next line, as {{ csrf_token() }} #}
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="webhook_id" value="{{ webhook.id }}">
                 <div class="row g-3">
@@ -39,7 +39,7 @@
             </form>
 
             <div class="d-flex gap-2">
-                <form method="post" action="{{ url_for('select_webhook', webhook_id=webhook.id, type=wtype) }}">
+                <form method="post" action="{{ url_for('select_webhook', webhook_id=webhook.id, type=wtype) }}"> {# nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -- Flask app; the token is the next line, as {{ csrf_token() }} #}
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="webhook_url" value="{{ webhook.webhookUrl or '' }}">
                     <input type="hidden" name="notification_email" value="{{ webhook.notificationEmailAddress or '' }}">
@@ -47,7 +47,7 @@
                     <button class="btn btn-info btn-sm">Edit Fields</button>
                 </form>
 
-                <form method="post" action="{{ url_for('delete_webhook', webhook_id=webhook.id, type=wtype) }}"
+                <form method="post" action="{{ url_for('delete_webhook', webhook_id=webhook.id, type=wtype) }}" {# nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -- Flask app; the token is the next line, as {{ csrf_token() }} #}
                       onsubmit="return confirm('Delete webhook {{ webhook.id }}?');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="btn btn-outline-danger btn-sm">Delete</button>
@@ -56,7 +56,7 @@
         </div>
     {% endfor %}
 
-    <form method="post" action="{{ url_for('delete_all_webhooks', type=wtype) }}" class="mb-4"
+    <form method="post" action="{{ url_for('delete_all_webhooks', type=wtype) }}" class="mb-4" {# nosemgrep: python.django.security.django-no-csrf-token.django-no-csrf-token -- Flask app; the token is the next line, as {{ csrf_token() }} #}
           onsubmit="return confirm('Delete ALL {{ config.label|lower }} webhooks? This cannot be undone.');">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <button class="btn btn-outline-danger btn-sm">Delete All {{ config.label }} Webhooks</button>

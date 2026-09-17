@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="result">
-        <?= $test_result ?>
+        <?= $test_result ?> <?php // nosemgrep: php.lang.security.taint-unsafe-echo-tag.taint-unsafe-echo-tag -- holds only an int HTTP code and an htmlspecialchars-escaped error ?>
     </div>
 </div>
 </body>
