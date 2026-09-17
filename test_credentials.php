@@ -1,7 +1,9 @@
 <?php
 session_start();
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
+// Errors go to the server log, never the browser: this page handles API credentials.
+ini_set('display_errors', 0);
+ini_set('display_startup_errors', 0);
+ini_set('log_errors', 1);
 error_reporting(E_ALL);
 
 // Check session credentials
