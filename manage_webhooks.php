@@ -426,6 +426,16 @@ if ($webhook_id) {
 
 
 function renderCredentialForm($code, $user, $secret, $url, $baseUrl, $notificationemailaddress, $webhook_name) {
+    // Every one of these lands inside a value="..." attribute, so an unescaped
+    // quote would let the caller's input break out and add its own markup.
+    $code = htmlspecialchars($code, ENT_QUOTES, 'UTF-8');
+    $user = htmlspecialchars($user, ENT_QUOTES, 'UTF-8');
+    $secret = htmlspecialchars($secret, ENT_QUOTES, 'UTF-8');
+    $url = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+    $baseUrl = htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8');
+    $notificationemailaddress = htmlspecialchars($notificationemailaddress, ENT_QUOTES, 'UTF-8');
+    $webhook_name = htmlspecialchars($webhook_name, ENT_QUOTES, 'UTF-8');
+
     return <<<HTML
 <!DOCTYPE html>
 <html lang="en">
@@ -544,9 +554,9 @@ HTML;
              ?>
             <tr>
                 <td><?= htmlspecialchars($fname) ?></td>
-                <td><input class="form-check-input subscribe-checkbox" type="checkbox" name="fields[<?= $fname ?>][]" value="subscribe"
+                <td><input class="form-check-input subscribe-checkbox" type="checkbox" name="fields[<?= htmlspecialchars($fname, ENT_QUOTES, 'UTF-8') ?>][]" value="subscribe"
                     <?= in_array('subscribe', $selected[$fvalue] ?? []) ? 'checked' : '' ?>></td>
-                <td><input class="form-check-input display-checkbox" type="checkbox" name="fields[<?= $fname ?>][]" value="display"
+                <td><input class="form-check-input display-checkbox" type="checkbox" name="fields[<?= htmlspecialchars($fname, ENT_QUOTES, 'UTF-8') ?>][]" value="display"
                     <?= in_array('display', $selected[$fvalue] ?? []) ? 'checked' : '' ?>></td>
             </tr>
         <?php endforeach; ?>
