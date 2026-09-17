@@ -28,9 +28,9 @@ if (isset($_GET['delete'])) {
     curl_close($ch);
 
     if ($deleteCode == 200 || $deleteCode == 204) {
-        echo "<p style='color:green;'>? Webhook ID $id deleted successfully.</p>";
+        echo "<p style='color:green;'>? Webhook ID " . htmlspecialchars($id) . " deleted successfully.</p>";
     } else {
-        echo "<p style='color:red;'>? Failed to delete webhook ID $id (HTTP $deleteCode): $deleteResponse</p>";
+        echo "<p style='color:red;'>? Failed to delete webhook ID " . htmlspecialchars($id) . " (HTTP " . htmlspecialchars($deleteCode) . "): " . htmlspecialchars($deleteResponse) . "</p>";
     }
 }
 

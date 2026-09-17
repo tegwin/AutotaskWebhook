@@ -5,7 +5,13 @@ define('CRED_FILE', __DIR__ . '/creds.json');
 function loadCredentialsFromFile() {
     return file_exists(CRED_FILE) ? json_decode(file_get_contents(CRED_FILE), true) : null;
 }
+// Only these three webhook types exist; anything else is not echoed back
+// into the page, which is where it would otherwise become script.
+$allowedTypes = ['company', 'ticket', 'contact'];
 $type = $_GET['type'] ?? 'company';
+if (!in_array($type, $allowedTypes, true)) {
+    $type = 'company';
+}
 
 
 if (isset($_GET['edit_creds'])) {
@@ -314,10 +320,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_webhook'])) {
                 </div>
                 <div class="mt-3">
                     <button class="btn btn-success btn-sm">Save Changes</button>
-                    <a href="webhook.php?type=<?= $type ?>&edit_creds=1&webhookUrl=<?= urlencode($webhook['webhookUrl']) ?>&notificationEmailAddress=<?= urlencode($webhook['notificationEmailAddress']) ?>&webhook_name=<?= urlencode($webhook['name']) ?>&webhook_id=<?= $webhook['id'] ?>"
+                    <a href="webhook.php?type=<?= $type ?>&edit_creds=1&webhookUrl=<?= urlencode($webhook['webhookUrl']) ?>&notificationEmailAddress=<?= urlencode($webhook['notificationEmailAddress']) ?>&webhook_name=<?= urlencode($webhook['name']) ?>&webhook_id=<?= urlencode($webhook['id']) ?>"
                         class="btn btn-info btn-sm">Edit Fields</a>
 
-                    <a href="?type=<?= $type ?>&delete_id=<?= $webhook['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this webhook?')">Delete</a>
+                    <a href="?type=<?= $type ?>&delete_id=<?= urlencode($webhook['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this webhook?')">Delete</a>
                 </div>
             </form>
         <?php endforeach; ?>

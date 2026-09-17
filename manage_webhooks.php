@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['test_connection'])) {
     if ($httpCode == 200) {
         $message = "<div class='alert alert-success'>✅ Connection successful!</div>";
     } else {
-        $message = "<div class='alert alert-danger'>❌ Test failed (HTTP $httpCode)<br>$testResponse</div>";
+        $message = "<div class='alert alert-danger'>❌ Test failed (HTTP $httpCode)<br>" . htmlspecialchars($testResponse) . "</div>";
     }
 
     echo $message;

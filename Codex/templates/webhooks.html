@@ -1,0 +1,23 @@
+{% extends 'base.html' %}{% block content %}
+<h2>{{ kind|capitalize }} webhooks</h2>
+{% for hook in webhooks %}<section>
+<h3>{{ hook.get('name','Webhook') }} <small>#{{ hook.id }} · {{ 'Active' if hook.get('isActive') else 'Inactive' }}</small></h3>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"><input type="hidden" name="id" value="{{ hook.id }}">
+<div class="grid"><div><label for="url-{{ hook.id }}">Webhook URL</label><input id="url-{{ hook.id }}" type="url" name="webhookUrl" value="{{ hook.get('webhookUrl','') }}" required></div>
+<div><label for="email-{{ hook.id }}">Notification email</label><input id="email-{{ hook.id }}" type="email" name="notificationEmailAddress" value="{{ hook.get('notificationEmailAddress','') }}" required></div>
+<div><label for="name-{{ hook.id }}">Name</label><input id="name-{{ hook.id }}" name="webhook_name" value="{{ hook.get('name','') }}" required></div></div>
+<div class="actions"><button name="action" value="update">Save changes</button><a href="{{ url_for('manage_webhooks.index',type=kind,webhook_id=hook.id) }}">Edit fields</a>
+<button class="danger" name="action" value="delete" formnovalidate onclick="return confirm('Delete this webhook?')">Delete</button></div></form></section>
+{% else %}<p>No {{ kind }} webhooks found.</p>{% endfor %}
+<section><h2>Create {{ kind }} webhook</h2><form method="post">
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"><input type="hidden" name="action" value="create">
+<label for="new-url">Webhook URL</label><input id="new-url" name="webhookUrl" type="url" value="{{ default_url }}" required>
+<label for="new-email">Notification email</label><input id="new-email" name="notificationEmailAddress" type="email" required>
+<label for="new-name">Name</label><input id="new-name" name="webhook_name" required>
+<label for="new-secret">Webhook secret key</label><input id="new-secret" name="secretKey" type="password" autocomplete="new-password" required>
+<p><small>Use the secret expected by your webhook receiver. Create, update and delete event subscriptions are enabled.</small></p>
+<button>Create webhook</button></form></section>
+{% if webhooks %}<section><details><summary>Delete all {{ kind }} webhooks</summary>
+<form method="post" action="{{ url_for('delete_all_webhooks.index',type=kind) }}" onsubmit="return confirm('Delete every webhook of this type?')">
+<input type="hidden" name="csrf_token" value="{{ session.csrf_token }}"><label for="confirmation">Type DELETE to confirm</label><input id="confirmation" name="confirmation" required pattern="DELETE"><button class="danger">Delete all {{ kind }} webhooks</button></form></details></section>{% endif %}
+{% endblock %}

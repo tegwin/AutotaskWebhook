@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Select Fields{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm mb-4" style="border-left: 4px solid #0d6efd;">
+    <div class="card-body">
+        <h5 class="card-title mb-3">Webhook Details</h5>
+        <p class="mb-1"><strong>Type:</strong> {{ config.label }}</p>
+        <p class="mb-1"><strong>Webhook URL:</strong> {{ creds.webhook_url }}</p>
+        <p class="mb-1"><strong>Webhook ID:</strong> {{ webhook_id }}</p>
+        <p class="mb-0"><strong>Webhook Name:</strong> {{ creds.webhook_name }}</p>
+    </div>
+</div>
+
+{% if not webhook_id %}
+    <div class="alert alert-warning">
+        No webhook selected. Pick one from
+        <a href="{{ url_for('webhooks', type=wtype) }}">Manage Webhooks</a> and choose &ldquo;Edit Fields&rdquo;.
+    </div>
+{% endif %}
+
+<form id="field-selection-form">
+    <h4>Standard Fields</h4>
+    {% if not standard_fields %}
+        <div class="alert alert-info">No standard fields returned for this webhook type.</div>
+    {% else %}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Field Name</th>
+            <th>Trigger<br>
+                <label><input type="checkbox" id="select-all-subscribe" class="form-check-input"> Select All</label>
+            </th>
+            <th>Include<br>
+                <label><input type="checkbox" id="select-all-display" class="form-check-input"> Select All</label>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for field in standard_fields %}
+            {% set fid = field.value|string %}
+            <tr>
+                <td>{{ field.label }}</td>
+                <td><input class="form-check-input subscribe-checkbox" type="checkbox"
+                           data-field-id="{{ fid }}" data-field-name="{{ field.label }}" data-udf="0"
+                           {% if 'subscribe' in selected.get(fid, []) %}checked{% endif %}></td>
+                <td><input class="form-check-input display-checkbox" type="checkbox"
+                           data-field-id="{{ fid }}" data-field-name="{{ field.label }}" data-udf="0"
+                           {% if 'display' in selected.get(fid, []) %}checked{% endif %}></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <h4>User-Defined Fields (UDF)</h4>
+    {% if not udf_fields %}
+        <div class="alert alert-info">No user-defined fields found.</div>
+    {% else %}
+    <table class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Field Name</th>
+            <th>Trigger<br>
+                <label><input type="checkbox" id="select-all-subscribe-udf" class="form-check-input"> Select All</label>
+            </th>
+            <th>Include<br>
+                <label><input type="checkbox" id="select-all-display-udf" class="form-check-input"> Select All</label>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for udf in udf_fields %}
+            {% set fid = udf.value|string %}
+            <tr>
+                <td>{{ udf.label }}</td>
+                <td><input class="form-check-input subscribe-checkbox-udf" type="checkbox"
+                           data-field-id="{{ fid }}" data-field-name="{{ udf.label }}" data-udf="1"
+                           {% if 'subscribe' in selected.get(fid, []) %}checked{% endif %}></td>
+                <td><input class="form-check-input display-checkbox-udf" type="checkbox"
+                           data-field-id="{{ fid }}" data-field-name="{{ udf.label }}" data-udf="1"
+                           {% if 'display' in selected.get(fid, []) %}checked{% endif %}></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+
+    <div id="save-status" class="alert alert-info d-none align-items-center">
+        <span>Saving fields... this may take a moment.</span>
+        <div class="spinner-border text-success ms-2" role="status" style="width: 1.5rem; height: 1.5rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+    <div id="result-message" class="mt-3"></div>
+
+    <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-success" id="save-button" {% if not webhook_id %}disabled{% endif %}>Save Field Selections</button>
+        <a class="btn btn-secondary" href="{{ url_for('credentials') }}">Back to Credentials</a>
+        <a class="btn btn-success" href="{{ url_for('webhooks', type=wtype) }}">Manage Webhooks</a>
+    </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const SAVE_URL = "{{ url_for('save_fields', type=wtype) }}";
+const WEBHOOK_ID = "{{ webhook_id }}";
+
+function bindSelectAll(masterId, checkboxClass) {
+    const master = document.getElementById(masterId);
+    if (!master) return;
+    master.addEventListener('change', function () {
+        document.querySelectorAll('.' + checkboxClass).forEach(cb => { cb.checked = this.checked; });
+    });
+}
+
+bindSelectAll('select-all-subscribe', 'subscribe-checkbox');
+bindSelectAll('select-all-display', 'display-checkbox');
+bindSelectAll('select-all-subscribe-udf', 'subscribe-checkbox-udf');
+bindSelectAll('select-all-display-udf', 'display-checkbox-udf');
+
+// Collect every ticked box into {fieldId: {name, udf, subscribe, display}}.
+function collectSelections() {
+    const fields = {};
+    document.querySelectorAll('input[data-field-id]').forEach(cb => {
+        if (!cb.checked) return;
+        const id = cb.dataset.fieldId;
+        if (!fields[id]) {
+            fields[id] = {
+                name: cb.dataset.fieldName,
+                udf: cb.dataset.udf === '1',
+                subscribe: false,
+                display: false
+            };
+        }
+        if (cb.classList.contains('subscribe-checkbox') || cb.classList.contains('subscribe-checkbox-udf')) {
+            fields[id].subscribe = true;
+        } else {
+            fields[id].display = true;
+        }
+    });
+    return fields;
+}
+
+document.getElementById('field-selection-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    const saveButton = document.getElementById('save-button');
+    const saveStatus = document.getElementById('save-status');
+    const resultMessage = document.getElementById('result-message');
+
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+    saveStatus.classList.remove('d-none');
+    saveStatus.classList.add('d-flex');
+    resultMessage.innerHTML = '';
+
+    try {
+        const response = await fetch(SAVE_URL + '&webhook_id=' + encodeURIComponent(WEBHOOK_ID), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fields: collectSelections() })
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            resultMessage.className = 'alert alert-success';
+            resultMessage.textContent = 'Fields saved successfully.';
+        } else {
+            resultMessage.className = 'alert alert-danger';
+            resultMessage.innerHTML = (result.errors || ['Unknown error.'])
+                .map(e => e.replace(/</g, '&lt;')).join('<br>');
+        }
+    } catch (error) {
+        resultMessage.className = 'alert alert-danger';
+        resultMessage.textContent = 'Save failed: ' + error;
+    }
+
+    saveButton.disabled = false;
+    saveButton.textContent = 'Save Field Selections';
+    saveStatus.classList.add('d-none');
+    saveStatus.classList.remove('d-flex');
+});
+</script>
+{% endblock %}
