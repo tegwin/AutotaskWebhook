@@ -27,7 +27,9 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'ApiIntegrationCode: ' . $creds['integration_code'],
     'Content-Type: application/json'
 ]);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+// Credentials travel in these headers, so the certificate must be verified.
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 curl_setopt($ch, CURLOPT_TIMEOUT, 20);
 
 $response = curl_exec($ch);
