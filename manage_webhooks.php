@@ -600,14 +600,14 @@ HTML;
 
                 <td><input class="form-check-input subscribe-checkbox-udf"
                         type="checkbox"
-                        name="fields[<?= $fid ?>][]"
+                        name="fields[<?= htmlspecialchars($fid, ENT_QUOTES, 'UTF-8') ?>][]"
                         <?= in_array('subscribe', $selected[$fid] ?? []) ? 'checked' : '' ?>
                         value="subscribe"
                     ></td>
 
                 <td><input class="form-check-input display-checkbox-udf"
                         type="checkbox"
-                        name="fields[<?= $fid ?>][]"
+                        name="fields[<?= htmlspecialchars($fid, ENT_QUOTES, 'UTF-8') ?>][]"
                         <?= in_array('display', $selected[$fid] ?? []) ? 'checked' : '' ?>
                         value="display"
                     ></td>

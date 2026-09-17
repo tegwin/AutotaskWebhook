@@ -292,14 +292,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_webhook'])) {
 
 
 
-    <h2>Manage <?= ucfirst($type) ?> Webhooks</h2>
+    <h2>Manage <?= htmlspecialchars(ucfirst($type), ENT_QUOTES, 'UTF-8') ?> Webhooks</h2>
     <div class="mb-3">
         <a href="?type=company" class="btn btn-outline-primary <?= $type === 'company' ? 'active' : '' ?>">Company</a>
         <a href="?type=ticket" class="btn btn-outline-success <?= $type === 'ticket' ? 'active' : '' ?>">Ticket</a>
         <a href="?type=contact" class="btn btn-outline-warning <?= $type === 'contact' ? 'active' : '' ?>">Contact</a>
     </div>
     <?php if (empty($webhooks)): ?>
-        <div class="alert alert-info">No webhooks found for <?= $type ?>.</div>
+        <div class="alert alert-info">No webhooks found for <?= htmlspecialchars($type, ENT_QUOTES, 'UTF-8') ?>.</div>
     <?php else: ?>
         <?php foreach ($webhooks as $webhook): ?>
             <form method="post" class="border rounded p-3 mb-4">
@@ -320,10 +320,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_webhook'])) {
                 </div>
                 <div class="mt-3">
                     <button class="btn btn-success btn-sm">Save Changes</button>
-                    <a href="webhook.php?type=<?= $type ?>&edit_creds=1&webhookUrl=<?= urlencode($webhook['webhookUrl']) ?>&notificationEmailAddress=<?= urlencode($webhook['notificationEmailAddress']) ?>&webhook_name=<?= urlencode($webhook['name']) ?>&webhook_id=<?= urlencode($webhook['id']) ?>"
+                    <a href="webhook.php?type=<?= urlencode($type) ?>&edit_creds=1&webhookUrl=<?= urlencode($webhook['webhookUrl']) ?>&notificationEmailAddress=<?= urlencode($webhook['notificationEmailAddress']) ?>&webhook_name=<?= urlencode($webhook['name']) ?>&webhook_id=<?= urlencode($webhook['id']) ?>"
                         class="btn btn-info btn-sm">Edit Fields</a>
 
-                    <a href="?type=<?= $type ?>&delete_id=<?= urlencode($webhook['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this webhook?')">Delete</a>
+                    <a href="?type=<?= urlencode($type) ?>&delete_id=<?= urlencode($webhook['id']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Delete this webhook?')">Delete</a>
                 </div>
             </form>
         <?php endforeach; ?>
@@ -337,7 +337,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_webhook'])) {
     <br>
     <br>
     <div class="card mb-4">
-        <div class="card-header bg-primary text-white">Create New <?php echo $type; ?> Webhook</div>
+        <div class="card-header bg-primary text-white">Create New <?php echo htmlspecialchars($type, ENT_QUOTES, 'UTF-8'); ?> Webhook</div>
         <div class="card-body">
             <form method="post" id="createWebhookForm">
                 <input type="hidden" name="create_webhook" value="1">
